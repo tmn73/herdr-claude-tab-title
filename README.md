@@ -19,6 +19,14 @@ herdr plugin install tmn73/herdr-claude-tab-title
 herdr plugin action invoke start --plugin claude-tab-title
 ```
 
+On a fresh install it may look like nothing happens, and that is deliberate: a
+tab that already carries a name is treated as yours and left alone. New tabs get
+titled as they appear. To hand your existing tabs over too, once:
+
+```sh
+herdr plugin action invoke reclaim --plugin claude-tab-title
+```
+
 For local development, point Herdr at a checkout instead:
 
 ```sh
