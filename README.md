@@ -8,7 +8,7 @@ tab, so the tab bar reads like a list of what you are working on rather than a
 list of terminal numbers.
 
 No model, no API key, no prompt. Reading a title costs nothing, so there is no
-rate limit and nothing to configure.
+rate limit and no configuration you have to fill in before it works.
 
 ## Install
 
@@ -54,29 +54,48 @@ A useful keybinding for an immediate pass:
 key = "prefix+t"
 type = "plugin_action"
 command = "claude-tab-title.sync"
-description = "sync agent titles"
+description = "sync claude session titles onto tabs"
 ```
+
+## Configuration
+
+Two variables belong to this plugin. Both are optional.
+
+| Variable | Default | Effect |
+| --- | --- | --- |
+| `HERDR_CLAUDE_TAB_TITLE_INTERVAL_MS` | `10000` | How often the worker polls. Values below 2000 are ignored. |
+| `HERDR_CLAUDE_TAB_TITLE_MAX_LENGTH` | `60` | Character bound on a label. Values below 12 are ignored. |
+
+Two more are read but are not this plugin's to define:
+
+| Variable | Owner | Why it is read |
+| --- | --- | --- |
+| `CLAUDE_CONFIG_DIR` | Claude Code | Locates the transcripts, normally `~/.claude`. |
+| `HERDR_PLUGIN_STATE_DIR` | Herdr | Where the plugin records which labels are its own. Supplied automatically. |
+
+`HERDR_BIN_PATH` overrides the `herdr` binary if it is not on `PATH`.
 
 ## Behaviour
 
-The worker polls every 10 seconds. Override with `CLAUDE_TAB_TITLE_INTERVAL_MS`
-(minimum 2000).
-
-For each tab it picks the pane whose session should name it: the focused agent
-first, then any agent with a session. It then reads that agent's transcript and
+For each tab the worker picks the pane whose session should name it: the focused
+agent first, then any agent with a session. It reads that agent's transcript and
 applies the latest title it published.
 
-**Your own names win.** Rename a tab yourself and the plugin notices the label is
-not the one it wrote, marks the tab as yours, and stops touching it. Use
-`reclaim` to hand it back.
+**A label this plugin did not write is never overwritten.** A tab is claimed only
+while it still carries Herdr's own placeholder — a digits-only or empty label — or
+a label the plugin wrote itself. Name a tab yourself and it stays yours, including
+tabs you named before installing this, and labels set by other plugins. `reclaim`
+is the only way to hand one back.
 
 Tabs with no agent, and sessions that have not published a title yet, are left
 exactly as they are.
 
-Labels keep the agent's own wording, punctuation, and language. Only control
-characters and leading progress glyphs are stripped, and the result is bounded to
-48 characters, cut on a word boundary and never left ending on a preposition or
-article.
+Titles are applied as published, keeping the agent's own wording, punctuation and
+language. The only changes are collapsing whitespace and removing control
+characters, which would corrupt the tab bar, plus the length bound above. There is
+deliberately no cleverer trimming: an earlier version cut on word boundaries and
+dropped trailing prepositions, which quietly threw away the Jira key at the end of
+`Rechercher session Claude précédente pour ticket DS-940`.
 
 ## Agent support
 

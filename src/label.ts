@@ -1,12 +1,12 @@
 /**
  * Herdr stores long labels happily and handles overflow in the bar itself, so
  * this exists only so one pathological title cannot dominate the bar. Raise or
- * lower it with CLAUDE_TAB_TITLE_MAX_LENGTH.
+ * lower it with HERDR_CLAUDE_TAB_TITLE_MAX_LENGTH.
  */
 export const MAX_LABEL_LENGTH = 60;
 
 export function configuredMaxLength(env: NodeJS.ProcessEnv = process.env): number {
-  const raw = Number(env.CLAUDE_TAB_TITLE_MAX_LENGTH);
+  const raw = Number(env.HERDR_CLAUDE_TAB_TITLE_MAX_LENGTH);
   return Number.isFinite(raw) && raw >= 12 ? Math.floor(raw) : MAX_LABEL_LENGTH;
 }
 

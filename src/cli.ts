@@ -17,7 +17,7 @@ function stateDir(): string {
 }
 
 function intervalMs(): number {
-  const raw = Number(process.env.CLAUDE_TAB_TITLE_INTERVAL_MS);
+  const raw = Number(process.env.HERDR_CLAUDE_TAB_TITLE_INTERVAL_MS);
   return Number.isFinite(raw) && raw >= 2_000 ? raw : DEFAULT_INTERVAL_MS;
 }
 
