@@ -14,7 +14,7 @@ import { pruneState, readState, writeState, emptyState } from "../src/state.ts";
 import { dominantPane } from "../src/sync.ts";
 import type { AgentPane } from "../src/herdr.ts";
 
-const SESSION_ID = "5807bee1-631b-41f3-8f0a-770b160fe182";
+const SESSION_ID = "00000000-0000-4000-8000-000000000001";
 const title = (value: string) => JSON.stringify({ type: "ai-title", aiTitle: value });
 
 async function fixture(cwd: string, lines: string[]) {
