@@ -1,16 +1,26 @@
 /**
  * Herdr stores long labels happily and handles overflow in the bar itself, so
  * this exists only so one pathological title cannot dominate the bar. Raise or
- * lower it with AGENT_TITLE_MAX_LENGTH.
+ * lower it with CLAUDE_TAB_TITLE_MAX_LENGTH.
  */
 export const MAX_LABEL_LENGTH = 60;
 
 export function configuredMaxLength(env: NodeJS.ProcessEnv = process.env): number {
-  const raw = Number(env.AGENT_TITLE_MAX_LENGTH);
+  const raw = Number(env.CLAUDE_TAB_TITLE_MAX_LENGTH);
   return Number.isFinite(raw) && raw >= 12 ? Math.floor(raw) : MAX_LABEL_LENGTH;
 }
 
 const CONTROL = /[\p{Cc}\p{Cf}]/gu;
+
+/**
+ * Herdr labels a new tab with its index inside the workspace, so a digits-only
+ * or empty label means nobody has named it. Any other label was chosen by the
+ * operator or another plugin and is never overwritten.
+ */
+export function isUnnamed(label: string): boolean {
+  const value = label.trim();
+  return value === "" || /^\d+$/.test(value);
+}
 
 /**
  * The agent wrote this title for its operator, so it is passed through as

@@ -1,6 +1,6 @@
 import { sessionTitle, transcriptPath } from "./claude.ts";
 import { listAgentPanes, listTabs, renameTab, type AgentPane } from "./herdr.ts";
-import { configuredMaxLength, toLabel } from "./label.ts";
+import { configuredMaxLength, isUnnamed, toLabel } from "./label.ts";
 import { pruneState, readState, writeState, type State } from "./state.ts";
 
 export interface SyncOptions {
@@ -52,7 +52,7 @@ export async function sync(options: SyncOptions): Promise<SyncOutcome[]> {
 
     if (options.reclaim && record.manual) {
       delete record.manual;
-      state.tabs[tab.tabId] = record;
+      state.tabs[tab.tabId] = { ...record };
       dirty = true;
     }
 
@@ -62,11 +62,16 @@ export async function sync(options: SyncOptions): Promise<SyncOutcome[]> {
       continue;
     }
 
-    // A label we did not write means the operator renamed the tab; respect that.
-    if (record.applied !== undefined && tab.label !== record.applied) {
-      record.manual = true;
-      state.tabs[tab.tabId] = record;
-      dirty = true;
+    // Any label this plugin did not write belongs to whoever did write it: the
+    // operator naming a tab by hand, or another plugin. Only an untouched tab
+    // carrying Herdr's own numeric placeholder is ours to claim.
+    if (!options.reclaim && tab.label !== record.applied && !isUnnamed(tab.label)) {
+      if (!record.manual) {
+        state.tabs[tab.tabId] = { ...record, manual: true };
+        dirty = true;
+      }
+      outcomes.push({ tabId: tab.tabId, from: tab.label, to: "", action: "manual" });
+      continue;
     }
     if (record.manual) {
       outcomes.push({ tabId: tab.tabId, from: tab.label, to: "", action: "manual" });

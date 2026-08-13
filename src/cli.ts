@@ -17,7 +17,7 @@ function stateDir(): string {
 }
 
 function intervalMs(): number {
-  const raw = Number(process.env.AGENT_TITLE_INTERVAL_MS);
+  const raw = Number(process.env.CLAUDE_TAB_TITLE_INTERVAL_MS);
   return Number.isFinite(raw) && raw >= 2_000 ? raw : DEFAULT_INTERVAL_MS;
 }
 
@@ -25,7 +25,7 @@ async function start(): Promise<void> {
   const dir = stateDir();
   const existing = await liveWorker(dir);
   if (existing) {
-    console.log(`Agent Title already running (pid ${existing.pid})`);
+    console.log(`Claude Tab Title already running (pid ${existing.pid})`);
     return;
   }
   const child = spawn(
@@ -34,18 +34,18 @@ async function start(): Promise<void> {
     { detached: true, stdio: "ignore", env: process.env },
   );
   child.unref();
-  console.log(`Agent Title started (pid ${child.pid})`);
+  console.log(`Claude Tab Title started (pid ${child.pid})`);
 }
 
 async function stop(): Promise<void> {
   const dir = stateDir();
   const info = await readWorker(dir);
   if (!info || !alive(info.pid)) {
-    console.log("Agent Title not running");
+    console.log("Claude Tab Title not running");
     return;
   }
   process.kill(info.pid, "SIGTERM");
-  console.log(`Agent Title stopping (pid ${info.pid})`);
+  console.log(`Claude Tab Title stopping (pid ${info.pid})`);
 }
 
 async function status(): Promise<void> {
@@ -53,8 +53,8 @@ async function status(): Promise<void> {
   const info = await liveWorker(dir);
   console.log(
     info
-      ? `Agent Title running (pid ${info.pid}, since ${info.startedAt})`
-      : "Agent Title stopped",
+      ? `Claude Tab Title running (pid ${info.pid}, since ${info.startedAt})`
+      : "Claude Tab Title stopped",
   );
 }
 
@@ -89,7 +89,7 @@ async function main(argv = process.argv.slice(2)): Promise<void> {
     await action();
   } catch (error) {
     console.error(
-      `Agent Title: ${error instanceof Error ? error.message : String(error)}`,
+      `Claude Tab Title: ${error instanceof Error ? error.message : String(error)}`,
     );
     process.exitCode = 1;
   }

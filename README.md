@@ -1,6 +1,6 @@
-# herdr-agent-title
+# herdr-claude-tab-title
 
-Mirrors each coding agent's own session title onto its Herdr tab.
+Mirrors each Claude Code session title onto its Herdr tab.
 
 Claude Code already maintains a title for every session and revises it only when
 the subject of the work genuinely changes. This plugin copies that title onto the
@@ -15,14 +15,14 @@ rate limit and nothing to configure.
 Requires Herdr 0.7.0+ and Bun.
 
 ```sh
-herdr plugin install <owner>/herdr-agent-title
-herdr plugin action invoke start --plugin agent-title
+herdr plugin install <owner>/herdr-claude-tab-title
+herdr plugin action invoke start --plugin claude-tab-title
 ```
 
 For local development, point Herdr at a checkout instead:
 
 ```sh
-herdr plugin link /path/to/herdr-agent-title
+herdr plugin link /path/to/herdr-claude-tab-title
 ```
 
 ## Actions
@@ -36,7 +36,7 @@ herdr plugin link /path/to/herdr-agent-title
 | `logs` | Print the worker log |
 
 ```sh
-herdr plugin action invoke <action> --plugin agent-title
+herdr plugin action invoke <action> --plugin claude-tab-title
 ```
 
 A useful keybinding for an immediate pass:
@@ -45,13 +45,13 @@ A useful keybinding for an immediate pass:
 [[keys.command]]
 key = "prefix+t"
 type = "plugin_action"
-command = "agent-title.sync"
+command = "claude-tab-title.sync"
 description = "sync agent titles"
 ```
 
 ## Behaviour
 
-The worker polls every 10 seconds. Override with `AGENT_TITLE_INTERVAL_MS`
+The worker polls every 10 seconds. Override with `CLAUDE_TAB_TITLE_INTERVAL_MS`
 (minimum 2000).
 
 For each tab it picks the pane whose session should name it: the focused agent

@@ -1,55 +1,55 @@
-id = "agent-title"
-name = "Agent Title"
+id = "claude-tab-title"
+name = "Claude Tab Title"
 version = "0.1.0"
 min_herdr_version = "0.7.0"
-description = "Mirrors each coding agent's own session title onto its Herdr tab."
+description = "Mirrors each Claude Code session title onto its Herdr tab."
 platforms = ["linux", "macos"]
 
 [[actions]]
 id = "start"
-title = "Agent Title: start"
+title = "Claude Tab Title: start"
 description = "Start the detached title sync worker."
 contexts = ["global", "workspace"]
 command = ["sh", "src/run-bun.sh", "src/cli.ts", "start"]
 
 [[actions]]
 id = "stop"
-title = "Agent Title: stop"
+title = "Claude Tab Title: stop"
 description = "Stop the title sync worker."
 contexts = ["global", "workspace"]
 command = ["sh", "src/run-bun.sh", "src/cli.ts", "stop"]
 
 [[actions]]
 id = "status"
-title = "Agent Title: status"
+title = "Claude Tab Title: status"
 description = "Report worker status."
 contexts = ["global", "workspace"]
 command = ["sh", "src/run-bun.sh", "src/cli.ts", "status"]
 
 [[actions]]
 id = "sync"
-title = "Agent Title: sync now"
+title = "Claude Tab Title: sync now"
 description = "Apply agent session titles to every tab immediately."
 contexts = ["global", "workspace", "tab", "pane"]
 command = ["sh", "src/run-bun.sh", "src/cli.ts", "sync"]
 
 [[actions]]
 id = "dry-run"
-title = "Agent Title: dry run"
+title = "Claude Tab Title: dry run"
 description = "Report the labels a sync would apply without changing anything."
 contexts = ["global", "workspace", "tab", "pane"]
 command = ["sh", "src/run-bun.sh", "src/cli.ts", "dry-run"]
 
 [[actions]]
 id = "reclaim"
-title = "Agent Title: reclaim manual tabs"
+title = "Claude Tab Title: reclaim manual tabs"
 description = "Resume managing tabs that were renamed by hand."
 contexts = ["global", "workspace"]
 command = ["sh", "src/run-bun.sh", "src/cli.ts", "reclaim"]
 
 [[actions]]
 id = "logs"
-title = "Agent Title: logs"
+title = "Claude Tab Title: logs"
 description = "Print the worker log."
 contexts = ["global", "workspace"]
 command = ["sh", "src/run-bun.sh", "src/cli.ts", "logs"]

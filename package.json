@@ -1,7 +1,7 @@
 {
-  "name": "herdr-agent-title",
+  "name": "herdr-claude-tab-title",
   "version": "0.1.0",
-  "description": "Mirrors each coding agent's own session title onto its Herdr tab",
+  "description": "Mirrors each Claude Code session title onto its Herdr tab",
   "type": "module",
   "private": true,
   "scripts": {

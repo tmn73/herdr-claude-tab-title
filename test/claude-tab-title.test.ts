@@ -9,7 +9,7 @@ import {
   titleFromTranscript,
   transcriptPath,
 } from "../src/claude.ts";
-import { MAX_LABEL_LENGTH, toLabel } from "../src/label.ts";
+import { MAX_LABEL_LENGTH, isUnnamed, toLabel } from "../src/label.ts";
 import { pruneState, readState, writeState, emptyState } from "../src/state.ts";
 import { dominantPane } from "../src/sync.ts";
 import type { AgentPane } from "../src/herdr.ts";
@@ -18,7 +18,7 @@ const SESSION_ID = "5807bee1-631b-41f3-8f0a-770b160fe182";
 const title = (value: string) => JSON.stringify({ type: "ai-title", aiTitle: value });
 
 async function fixture(cwd: string, lines: string[]) {
-  const root = await mkdtemp(path.join(os.tmpdir(), "agent-title-"));
+  const root = await mkdtemp(path.join(os.tmpdir(), "claude-tab-title-"));
   const configDir = path.join(root, ".claude");
   const projectDir = path.join(configDir, "projects", encodeProjectDir(cwd));
   await mkdir(projectDir, { recursive: true });
@@ -118,8 +118,23 @@ test("the focused agent pane names the tab", () => {
   assert.equal(dominantPane([]), null);
 });
 
+test("only Herdr's own placeholder label is ours to claim", () => {
+  // Untouched tabs: Herdr names them by index inside the workspace.
+  assert.equal(isUnnamed("6"), true);
+  assert.equal(isUnnamed("12"), true);
+  assert.equal(isUnnamed(""), true);
+  assert.equal(isUnnamed("   "), true);
+  // Anything a human would type stays untouched, including short or odd names.
+  assert.equal(isUnnamed("cliamp"), false);
+  assert.equal(isUnnamed("gcal"), false);
+  assert.equal(isUnnamed("main"), false);
+  assert.equal(isUnnamed("848 - pay ALGC"), false);
+  assert.equal(isUnnamed("v2"), false);
+  assert.equal(isUnnamed("Fix the booking total"), false);
+});
+
 test("state survives a round trip and forgets closed tabs", async () => {
-  const dir = await mkdtemp(path.join(os.tmpdir(), "agent-title-state-"));
+  const dir = await mkdtemp(path.join(os.tmpdir(), "claude-tab-title-state-"));
   try {
     assert.deepEqual(await readState(dir), emptyState());
     const state = {
