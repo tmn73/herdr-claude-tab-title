@@ -12,7 +12,7 @@ rate limit and no configuration you have to fill in before it works.
 
 ## Install
 
-Requires Herdr 0.7.0+ and Bun.
+Requires Herdr 0.7.5+ and Bun.
 
 ```sh
 herdr plugin install tmn73/herdr-claude-tab-title
