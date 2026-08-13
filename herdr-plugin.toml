@@ -1,9 +1,16 @@
 id = "claude-tab-title"
 name = "Claude Tab Title"
-version = "0.1.0"
+version = "0.2.0"
 min_herdr_version = "0.7.0"
 description = "Mirrors each Claude Code session title onto its Herdr tab."
 platforms = ["linux", "macos"]
+
+# Runs once after Herdr restores the session and its API socket is ready. It
+# spawns the detached worker and returns immediately, so it stays the one-shot
+# initialisation Herdr expects rather than a supervised daemon. Starting an
+# already-running worker is a no-op.
+[[startup]]
+command = ["sh", "src/run-bun.sh", "src/cli.ts", "start"]
 
 [[actions]]
 id = "start"

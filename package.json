@@ -1,6 +1,6 @@
 {
   "name": "herdr-claude-tab-title",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Mirrors each Claude Code session title onto its Herdr tab",
   "type": "module",
   "private": true,

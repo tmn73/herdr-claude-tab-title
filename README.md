@@ -19,6 +19,9 @@ herdr plugin install tmn73/herdr-claude-tab-title
 herdr plugin action invoke start --plugin claude-tab-title
 ```
 
+That `start` is only needed for the current session. From then on Herdr starts the
+worker itself once its API socket is ready, so it survives a restart.
+
 On a fresh install it may look like nothing happens, and that is deliberate: a
 tab that already carries a name is treated as yours and left alone. New tabs get
 titled as they appear. To hand your existing tabs over too, once:
@@ -118,3 +121,7 @@ bun install
 bun run check
 bun test
 ```
+
+## License
+
+MIT
