@@ -15,7 +15,7 @@ rate limit and nothing to configure.
 Requires Herdr 0.7.0+ and Bun.
 
 ```sh
-herdr plugin install <owner>/herdr-claude-tab-title
+herdr plugin install tmn73/herdr-claude-tab-title
 herdr plugin action invoke start --plugin claude-tab-title
 ```
 
