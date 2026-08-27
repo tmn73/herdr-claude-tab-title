@@ -1,8 +1,8 @@
 id = "claude-tab-title"
 name = "Claude Tab Title"
-version = "0.2.0"
+version = "0.3.0"
 min_herdr_version = "0.7.5"
-description = "Mirrors each Claude Code session title onto its Herdr tab."
+description = "Mirrors each Claude Code session title, and its agent state, onto its Herdr tab."
 platforms = ["linux", "macos"]
 
 # Runs once after Herdr restores the session and its API socket is ready. It
@@ -53,6 +53,13 @@ title = "Claude Tab Title: reclaim manual tabs"
 description = "Resume managing tabs that were renamed by hand."
 contexts = ["global", "workspace"]
 command = ["sh", "src/run-bun.sh", "src/cli.ts", "reclaim"]
+
+[[actions]]
+id = "config"
+title = "Claude Tab Title: config"
+description = "Print the config file path and the settings in effect."
+contexts = ["global", "workspace"]
+command = ["sh", "src/run-bun.sh", "src/cli.ts", "config"]
 
 [[actions]]
 id = "logs"

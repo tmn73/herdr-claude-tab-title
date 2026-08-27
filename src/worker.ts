@@ -1,8 +1,7 @@
 import { appendFile, mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { DEFAULT_INTERVAL_MS } from "./config.ts";
 import { summarize, sync } from "./sync.ts";
-
-export const DEFAULT_INTERVAL_MS = 10_000;
 
 export interface WorkerInfo {
   pid: number;
@@ -83,7 +82,10 @@ export async function runWorker(
 
   while (!stopping) {
     try {
-      const outcomes = await sync({ stateDir });
+      const outcomes = await sync({
+        stateDir,
+        onError: (message) => void log(stateDir, message),
+      });
       const renamed = outcomes.filter((outcome) => outcome.action === "renamed");
       if (renamed.length) await log(stateDir, summarize(outcomes));
     } catch (error) {

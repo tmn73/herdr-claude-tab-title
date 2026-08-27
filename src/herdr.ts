@@ -1,8 +1,11 @@
 import { spawn } from "node:child_process";
+import { toAgentStatus, type AgentStatus } from "./status.ts";
 
 export interface Tab {
   tabId: string;
   label: string;
+  /** State of the agent Herdr attributes to the tab, "unknown" when it sees none. */
+  agentStatus: AgentStatus;
 }
 
 export interface AgentPane {
@@ -48,12 +51,16 @@ async function runJson(args: string[], env: NodeJS.ProcessEnv): Promise<unknown>
 
 export async function listTabs(env: NodeJS.ProcessEnv = process.env): Promise<Tab[]> {
   const payload = (await runJson(["tab", "list"], env)) as {
-    result?: { tabs?: { tab_id?: unknown; label?: unknown }[] };
+    result?: { tabs?: { tab_id?: unknown; label?: unknown; agent_status?: unknown }[] };
   };
   const tabs: Tab[] = [];
   for (const tab of payload.result?.tabs ?? []) {
     if (typeof tab.tab_id === "string") {
-      tabs.push({ tabId: tab.tab_id, label: typeof tab.label === "string" ? tab.label : "" });
+      tabs.push({
+        tabId: tab.tab_id,
+        label: typeof tab.label === "string" ? tab.label : "",
+        agentStatus: toAgentStatus(tab.agent_status),
+      });
     }
   }
   return tabs;

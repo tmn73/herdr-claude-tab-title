@@ -4,8 +4,10 @@ import path from "node:path";
 export interface TabRecord {
   /** The label this plugin last wrote, used to detect operator renames. */
   applied?: string;
-  /** Set once the operator renames the tab themselves; we then leave it alone. */
+  /** Set once the operator renames the tab themselves; the name is then theirs. */
   manual?: boolean;
+  /** The name under the state mark, so a label we did not choose survives a restyle. */
+  base?: string;
 }
 
 export interface State {

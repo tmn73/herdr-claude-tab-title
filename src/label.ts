@@ -1,14 +1,4 @@
-/**
- * Herdr stores long labels happily and handles overflow in the bar itself, so
- * this exists only so one pathological title cannot dominate the bar. Raise or
- * lower it with HERDR_CLAUDE_TAB_TITLE_MAX_LENGTH.
- */
-export const MAX_LABEL_LENGTH = 60;
-
-export function configuredMaxLength(env: NodeJS.ProcessEnv = process.env): number {
-  const raw = Number(env.HERDR_CLAUDE_TAB_TITLE_MAX_LENGTH);
-  return Number.isFinite(raw) && raw >= 12 ? Math.floor(raw) : MAX_LABEL_LENGTH;
-}
+import { DEFAULT_MAX_LENGTH } from "./config.ts";
 
 const CONTROL = /[\p{Cc}\p{Cf}]/gu;
 
@@ -27,7 +17,7 @@ export function isUnnamed(label: string): boolean {
  * published. Control characters are removed because they would corrupt the tab
  * bar, and whitespace is collapsed because a label is a single line.
  */
-export function toLabel(title: string, maxLength = MAX_LABEL_LENGTH): string | null {
+export function toLabel(title: string, maxLength = DEFAULT_MAX_LENGTH): string | null {
   const cleaned = title.replace(CONTROL, " ").replace(/\s+/g, " ").trim();
   if (!cleaned) return null;
   return cleaned.length <= maxLength ? cleaned : cleaned.slice(0, maxLength).trimEnd();

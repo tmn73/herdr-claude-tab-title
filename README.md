@@ -1,11 +1,17 @@
 # herdr-claude-tab-title
 
-Mirrors each Claude Code session title onto its Herdr tab.
+Mirrors each Claude Code session title, and its agent state, onto its Herdr tab.
 
 Claude Code already maintains a title for every session and revises it only when
 the subject of the work genuinely changes. This plugin copies that title onto the
 tab, so the tab bar reads like a list of what you are working on rather than a
 list of terminal numbers.
+
+Herdr marks agent state in its sidebar but leaves the tab bar plain, so the same
+mark is written in front of the label: `✅ Fix the booking total` for an agent that
+finished, `🟡` while it works, `🔴` when it is blocked, `⚪` when it is idle. The
+mark belongs to the plugin even on a tab you named yourself, so the state of every
+agent is readable without opening the sidebar.
 
 No model, no API key, no prompt. Reading a title costs nothing, so there is no
 rate limit and no configuration you have to fill in before it works.
@@ -44,6 +50,7 @@ herdr plugin link /path/to/herdr-claude-tab-title
 | `sync` | Apply titles to every tab now |
 | `dry-run` | Report what a sync would change, without changing it |
 | `reclaim` | Resume managing tabs you had renamed by hand |
+| `config` | Print the config file path and the settings in effect |
 | `logs` | Print the worker log |
 
 ```sh
@@ -62,19 +69,46 @@ description = "sync claude session titles onto tabs"
 
 ## Configuration
 
-Two variables belong to this plugin. Both are optional.
+Everything lives in `config.toml`, inside the config directory Herdr gives the
+plugin. The file is written on first run with every setting commented out, and
+`config` prints where it is and what is in effect:
 
-| Variable | Default | Effect |
-| --- | --- | --- |
-| `HERDR_CLAUDE_TAB_TITLE_INTERVAL_MS` | `10000` | How often the worker polls. Values below 2000 are ignored. |
-| `HERDR_CLAUDE_TAB_TITLE_MAX_LENGTH` | `60` | Character bound on a label. Values below 12 are ignored. |
+```sh
+herdr plugin action invoke config --plugin claude-tab-title
+```
 
-Two more are read but are not this plugin's to define:
+```toml
+# State mark written in front of every tab label:
+# "color" (default), "symbols" for Herdr's monochrome set, or "off" for none.
+palette = "color"
+
+# Per-state marks, over whichever palette is in use. Any glyph your terminal font
+# draws works, and "" leaves that state unmarked. This is the quiet setup: mark
+# what deserves a look, leave idle tabs alone.
+[marks]
+idle = ""
+
+# How often the worker looks for changes. Below 2000 is ignored.
+interval_ms = 10000
+
+# Character bound on a label. Below 12 is ignored.
+max_length = 60
+```
+
+Edits take effect on the next pass, so there is nothing to restart, except
+`interval_ms` which is read when the worker starts. A file that does not parse is
+logged and ignored: a typo must not stop tabs from being named.
+
+The same three settings can be overridden per run through the environment, which
+wins over the file: `HERDR_CLAUDE_TAB_TITLE_STATUS`,
+`HERDR_CLAUDE_TAB_TITLE_INTERVAL_MS`, `HERDR_CLAUDE_TAB_TITLE_MAX_LENGTH`.
+
+Two more variables are read but are not this plugin's to define:
 
 | Variable | Owner | Why it is read |
 | --- | --- | --- |
 | `CLAUDE_CONFIG_DIR` | Claude Code | Locates the transcripts, normally `~/.claude`. |
-| `HERDR_PLUGIN_STATE_DIR` | Herdr | Where the plugin records which labels are its own. Supplied automatically. |
+| `HERDR_PLUGIN_CONFIG_DIR`, `HERDR_PLUGIN_STATE_DIR` | Herdr | Where the settings live, and where the plugin records which labels are its own. Supplied automatically. |
 
 `HERDR_BIN_PATH` overrides the `herdr` binary if it is not on `PATH`.
 
@@ -89,6 +123,17 @@ while it still carries Herdr's own placeholder — a digits-only or empty label 
 a label the plugin wrote itself. Name a tab yourself and it stays yours, including
 tabs you named before installing this, and labels set by other plugins. `reclaim`
 is the only way to hand one back.
+
+The state mark is the exception, and it is not a name: a tab you named yourself
+keeps your name and is only restyled in front. The name is remembered without the
+mark, so rename it whenever you like and the next pass carries your new name.
+
+A tab label is text Herdr paints itself: it carries no colour of its own, and
+escape sequences in it would corrupt the bar. So the colour has to live in the
+glyph, which is what the default `color` palette is for. `symbols` swaps in
+Herdr's own `× ◐ ✓ ○`, so a tab reads exactly like its sidebar row, for a bar that
+should stay quiet, and `[marks]` sets any glyph you like per state. A tab Herdr
+sees no agent in gets no mark in any palette.
 
 Tabs with no agent, and sessions that have not published a title yet, are left
 exactly as they are.

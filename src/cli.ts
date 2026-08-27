@@ -1,14 +1,8 @@
 import { spawn } from "node:child_process";
 import path from "node:path";
+import { configPath, ensureConfigFile, settings } from "./config.ts";
 import { summarize, sync } from "./sync.ts";
-import {
-  DEFAULT_INTERVAL_MS,
-  alive,
-  liveWorker,
-  readWorker,
-  runWorker,
-  workerPaths,
-} from "./worker.ts";
+import { alive, liveWorker, readWorker, runWorker, workerPaths } from "./worker.ts";
 
 function stateDir(): string {
   const dir = process.env.HERDR_PLUGIN_STATE_DIR;
@@ -16,13 +10,10 @@ function stateDir(): string {
   return dir;
 }
 
-function intervalMs(): number {
-  const raw = Number(process.env.HERDR_CLAUDE_TAB_TITLE_INTERVAL_MS);
-  return Number.isFinite(raw) && raw >= 2_000 ? raw : DEFAULT_INTERVAL_MS;
-}
-
 async function start(): Promise<void> {
   const dir = stateDir();
+  // Written on the first run so the settings are discoverable without the README.
+  await ensureConfigFile();
   const existing = await liveWorker(dir);
   if (existing) {
     console.log(`Claude Tab Title already running (pid ${existing.pid})`);
@@ -59,18 +50,40 @@ async function status(): Promise<void> {
 }
 
 async function syncOnce(options: { dryRun?: boolean; reclaim?: boolean }): Promise<void> {
-  const outcomes = await sync({ stateDir: stateDir(), ...options });
+  const outcomes = await sync({
+    stateDir: stateDir(),
+    onError: (message) => console.error(`Claude Tab Title: ${message}`),
+    ...options,
+  });
   console.log(summarize(outcomes));
+}
+
+/** Answers "where do I configure this, and what is it doing right now". */
+async function showConfig(): Promise<void> {
+  await ensureConfigFile();
+  const config = await settings(process.env, (message) =>
+    console.error(`Claude Tab Title: ${message}`),
+  );
+  const marks = config.marks
+    ? Object.entries(config.marks)
+        .map(([state, glyph]) => `${state}=${glyph || "(none)"}`)
+        .join(" ")
+    : "off";
+  console.log(configPath() ?? "(no config dir)");
+  console.log(`marks       ${marks}`);
+  console.log(`interval_ms ${config.intervalMs}`);
+  console.log(`max_length  ${config.maxLength}`);
 }
 
 const ACTIONS: Record<string, () => Promise<void>> = {
   start,
   stop,
   status,
-  run: async () => runWorker(stateDir(), intervalMs()),
+  run: async () => runWorker(stateDir(), (await settings()).intervalMs),
   sync: () => syncOnce({}),
   "dry-run": () => syncOnce({ dryRun: true }),
   reclaim: () => syncOnce({ reclaim: true }),
+  config: showConfig,
   logs: async () => {
     const { readFile } = await import("node:fs/promises");
     const text = await readFile(workerPaths(stateDir()).log, "utf8").catch(() => "");
